@@ -72,13 +72,14 @@ def getKey(blockDim):
 	return key
 
 
-def encryption(plaintext, chiave, m):
+def encryption(plaintext, chiave):
 	""" Cripta un testo in chiaro
 	:param plaintext: stringa di plaintext
 	:param chiave: matrice di dimensione m usata per criptare
 	:param m: dimensione del blocco
 	:return: stringa contenente il ciphertext
 	"""
+	m = chiave.shape[0]
 	plaintext = stringToNumber(plaintext)  # ritorna una lista contenente la conversione da lettere a numeri
 	plainBlocks = get_M_blocks(plaintext,m)
 
@@ -107,13 +108,14 @@ def invMatModN(matrix, n):
 	return np.array(result)
 
 
-def decryptions(ciphertext, chiave, m):
+def decryptions(ciphertext, chiave):
 	""" Decripta un testo cifrato
 	:param ciphertext: stringa di ciphertext
 	:param chiave: matrice di dimensione m usata per criptare
 	:param m: dimensione del blocco
 	:return: stringa contenente il plaintext
 	"""
+	m = chiave.shape[0]
 	ciphertext = stringToNumber(ciphertext)  # ritorna una lista contenente la conversione da lettere a numeri
 	cipherBlocks = get_M_blocks(ciphertext, m)
 	C = np.array(cipherBlocks).transpose()
@@ -187,11 +189,11 @@ def main():
 	# CRIPTO IL PLAINTEXT
 	K = getKey(4)
 	print("Key\n-----\n" + str(K) + "\n-----\n")
-	ciphertext = encryption(plaintext, K, 4)
+	ciphertext = encryption(plaintext, K)
 	print("Ciphertext\n-----\n" + ciphertext + "\n-----\n")
 
 	# DECRIPTO IL CIPHERTEXT
-	plaintext_return = decryptions(ciphertext, K, 4)
+	plaintext_return = decryptions(ciphertext, K)
 	print("Plaintext_returned\n-----\n" + plaintext_return + "\n-----\n")
 
 	# ATTACCO ALLA CHIAVE

@@ -3,6 +3,7 @@ import re
 import math
 
 
+
 def adjustText(text):
 	text = text.upper()  # conversione in maiuscolo
 	text = re.sub(r"['\",.;:_@#()”“’—?!&$\n]+\ *", " ", text)  # conversione dei caratteri speciali in uno spazio
@@ -36,18 +37,45 @@ def frequency_analysis(text, m, p = None):
 				freqdict[t] = freqdict[t] + 1
 			else:
 				freqdict[t] = 1
+
+	#PER LA STAMPA
+	sorted_freq = sorted(freqdict.items(), key=lambda kv: kv[1],reverse=True)
+	xlist= [sorted_freq[i][0] for i in range(len(sorted_freq))]
+	ylist= [sorted_freq[i][1] for i in range(len(sorted_freq))]
 	if p=='plot':
-		plot(freqdict)
+		if m ==1:
+			createPlot(xlist,ylist,'letter','frequency','LetterFrequency')
+		else:
+			createPlot(xlist, ylist, 'letter', 'frequency', 'LetterFrequency',number_xData=10)
 
 	return freqdict
 
-def plot(dict):
-	# PLOT il contenuto di un dizionario
-	x = list(dict.keys())
-	y = list(dict.values())
-	centers = range(len(x))
-	plt.bar(centers, y, align='center', tick_label=x)
+# def plot(dict):
+# 	# PLOT il contenuto di un dizionario
+# 	x = list(dict.keys())
+# 	y = list(dict.values())
+# 	centers = range(len(x))
+# 	plt.bar(centers, y, align='center', tick_label=x)
+# 	plt.show()
+
+def createPlot(xData, yData, xLabel, yLabel, plotTitle, number_xData = None):
+	""" Creazione del grafico
+	:param xData: Lista di dati per l'asse x
+	:param yData: Lista di dati per l'asse y
+	:param xLabel: etichetta per l'asse x
+	:param yLabel: etichetta per l'asse y
+	:param plotTitle: Titolo del grafico
+	"""
+	if number_xData != None:
+		xData = xData[0:number_xData]
+		yData = yData[0:number_xData]
+
+	plt.bar(xData, yData)
+	plt.xlabel(xLabel)
+	plt.ylabel(yLabel)
+	plt.title(plotTitle)
 	plt.show()
+
 
 
 def m_gramms_distibutions(text, m, p=None):
@@ -64,12 +92,32 @@ def m_gramms_distibutions(text, m, p=None):
 	for k in freqdict.keys():  # scorro tutte le chiavi del dizionario
 		distdict[k] = freqdict[k]/tot_m_grams # freqdict[k] mi ritorna il valore della chiave k
 
+	#PER LA STAMPA
+	sorted_dist = sorted(distdict.items(), key=lambda kv: kv[1],reverse=True)
+	xlist= [sorted_dist[i][0] for i in range(len(sorted_dist))]
+	ylist= [sorted_dist[i][1] for i in range(len(sorted_dist))]
 	if p=='plot':
-		plot(distdict)
+		if m ==1:
+			createPlot(xlist,ylist,'letter','probability','distibution')
+		else:
+			createPlot(xlist, ylist, 'letter', 'probability', 'distibution',number_xData=10)
+
 	return distdict
 
 
 def indexOfCoincidence(text,m):
+	freqdict = frequency_analysis(text,m)
+	ic = 0.0
+	tot_m_grams = sum(freqdict.values())
+	print("numero di m-grams: " + str(tot_m_grams))
+
+	for value in freqdict.values():
+		ic = ic + ((value * (value - 1)) / (tot_m_grams * (tot_m_grams - 1)))
+	return ic
+
+
+#INDICE DI INCIDENZA UTILE PER VIGENERE
+def indexOfCoincidenceVigenere(text,m):
 	""" Calcola l'indice di concidenza di una stringa. Se passo un valore di m>1 allora si stampano m indici di concidenza
 	:param text: stringa di testo
 	:param m: valore con il quale si prendo i valori della stringa(ad esempio se m = 2 prendo s[0],s[2],s[4],...  e  s[1],s[3],s[5],... dove s è la stinga)
@@ -107,15 +155,20 @@ def entropy(text, m):
 
 def main():
 
-	textFile = open("./Moby_Dick_chapter_one.txt", "r")
-	text = textFile.read()
+	text = "kbrvdlikdihpbxhzenugntvnrfydttvvuihviwikvltgvmgfdgrtkbecfhgjmzvvrnpqthvujwegmgeyfofgebjvtlvvqveccsrzifmevxnuggxyvnvewmxvijrnbmsnvfnplbrrgyagbkekzhtupkmccpbkkxhvtfntmwmklhskbmsftwhrgttcrwrkvaiisugjzhsdkbrukkivenugvwmjgfnamwlvivnvpksfduafxbgbvxhrokewwcgkwglvivnvpksfdqnntmsfkbruifiwrgvnqtvjtlnytmlzjnvomkirucaitxeefprtbaisfqycvwxyvhgcsxeuzprcteswpihczxhvrxvcutpzmy"
 	text = adjustText(text)
-
-	for i in range(1,5):
-		frequency_analysis(text, i, p='plot')
-		m_gramms_distibutions(text, i, p ='plot')
-		indexOfCoincidence(text,i)
-		print("Entropy = ",entropy(text,i),"\n")
+	indexOfCoincidenceVigenere(text,8)
+	# textFile = open("./Moby_Dick_chapter_one.txt", "r")
+	# text = textFile.read()
+	# text = adjustText(text)
+	#
+	#
+	# for i in range(1,5):
+	# 	print("m =",i)
+	# 	frequency_analysis(text, i, p='plot')
+	# 	m_gramms_distibutions(text, i, p ='plot')
+	# 	print("Indice di coincidenza =",indexOfCoincidence(text,i))
+	# 	print("Entropia =",entropy(text,i),"\n")
 
 
 

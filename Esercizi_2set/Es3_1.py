@@ -259,4 +259,3 @@ def testRSA2(k):
 if __name__ == '__main__':
 	testRSA(1024)
 	#testRSA2(20)
-	#genPrim(1000,0.001)
